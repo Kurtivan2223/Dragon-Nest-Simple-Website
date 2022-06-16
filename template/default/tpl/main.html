@@ -1,0 +1,139 @@
+<?php require_once 'header.html'; ?>
+
+<header class="header">
+    <div class="top-panel flex-s-c">
+        <ul class="menu">
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li>
+                <a href="/Register">Register</a>
+            </li>
+            <li>
+                <a href="/Downloads">Download</a>
+            </li>
+        </ul>
+    </div>
+    <div class="logo">
+        <a href="/"><img src="<?php echo get_config("baseurl"); ?>/template/<?php echo get_config("template");?>/images/logo.png" alt="Logo"></a>
+    </div>
+</header>
+<div class="container">
+    <?php if(strpos($_SERVER['REQUEST_URI'], 'Register') !== false)
+    { ?>
+        <main class="content">
+            <div class="alert alert-info">
+                test
+            </div>
+        </main>
+    <?php
+    }
+    else
+    { ?>
+        <main class="content"><div class="alert alert-info"><strong>Info!</strong> No posted news!</div></main>
+    <?php
+    }
+    ?>
+    <aside class="sidebar">
+        <div class="download-button flex-c-c">
+            <a href="/Downloads"><span>Download</span> Download files to play a game</a>
+        </div>
+        <div class="login-block" id="Login-form">
+            <?php 
+                error_msg();
+                success_msg();
+            ?>
+            <form action="" method="POST">
+                <p><input type="text" name="username" placeholder="Username"></p>
+                <p><input type="password" name="password" placeholder="Password"></p>
+                <div class="login flex-s">
+                    <div class="l-login">
+                        <p><a href="/Register" class="reg">NEW HERE?</a></p>
+                    </div>
+                    <div class='r-login'>
+                        <button name="login" type="submit" >Login</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="widget">
+            <span class="widget-title flex-c-c">Server Statistics</span>
+            <ul>
+                <li>
+                    Server Time:
+                    <span class="badge">
+                        <span id="ServerTime">
+                            <?php echo server_time(); ?>
+                        </span>
+                    </span>
+                </li>
+                <li>
+                    Online Players:
+                    <span class="badge">
+                        <span id="ServerTime">
+                            <?php
+                                OnlineCount();
+                            ?>
+                        </span>
+                    </span>
+                </li>
+                <li>
+                    Accounts:
+                    <span class="badge">
+                        <span id="ServerTime">
+                            <?php 
+                                AccountCount();
+                            ?>
+                        </span>
+                    </span>
+                </li>
+                <li>
+                    Characters:
+                    <span class="badge">
+                        <span id="ServerTime">
+                            <?php CharacterCount(); ?>
+                        </span>
+                    </span>
+                </li>
+                <li>
+                    Guilds:
+                    <span class="badge">
+                        <span id="ServerTime">
+                            <?php GuildCount(); ?>
+                        </span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+        <div class='widget'>
+            <span class='widget-title flex-c-c'>Server INFORMATION</span>
+            <ul>
+                <li>
+                    Drops:
+                    <span class='badge'>
+                            <span id='ServerTime'>x1 (Normal)</span>
+                    </span>
+                </li>
+                <li>
+                    Exp:
+                    <span class='badge'>
+                        <span id='ServerTime'>x1 (Normal)</span>
+                    </span>
+                </li>
+                <li>
+                    Gold Drop:
+                    <span class='badge'>
+                        <span id='ServerTime'>x1 (Normal)</span>
+                    </span>
+                </li>
+                <li>
+                    Nest Reset:
+                    <span class='badge'>
+                        <span id='ServerTime'>Wednesday | Friday | Sunday</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </aside>
+</div>
+<?php require_once 'footer.html'; ?>
