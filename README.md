@@ -2,7 +2,7 @@
 PHP >= 8.1 and Nginx
 
 
-##****[nginx.conf]****
+## ****[nginx.conf]****
 
 ```
 worker_processes  1;
