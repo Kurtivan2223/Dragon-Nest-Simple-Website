@@ -1,0 +1,15 @@
+<div class="login-block" id="Login-form">
+    <div id='inside'>
+        <ul class='style4'>
+            <div class='first' style='text-align: center;padding-bottom: 20px;color:#fff;'>
+                Welcome, <b> <?php echo $_SESSION['AccountName']; ?></b> !
+            </div>
+            <div class='white-box acc-menu'>
+                <div class='in'>Cash: <span class='my_credits'><?php echo $_SESSION['cash']; ?></span>
+                    <a class='without_img' href='Changepass?username=<?php echo $_SESSION['AccountName']; ?>'>Change Password</a>
+                    <a class='codecs' href='/account/user/logout?redirect'>Logout</a>
+                </div>
+            </div>
+        </ul>
+    </div>
+</div>

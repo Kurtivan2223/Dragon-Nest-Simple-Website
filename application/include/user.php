@@ -13,24 +13,20 @@
             }
         }
 
-        public static function get_intIp()
+        public static function get_intIp($ip)
         {
-            $ip = get_ip();
-
             $request = database::$connection->query("
             DECLARE @vchLoginIP varchar(15) = '$ip'
-            DECLARE @secret int = dbo.FN_IP2IPNumber(@vchLoginIP)
+            DECLARE @secret int = DNMembership.dbo.FN_IP2IPNumber(@vchLoginIP)
 
             SELECT @secret AS IP");
 
-            $result = $request->fetchall();
+            $results = $request->fetchall();
 
-            foreach ($request as $get)
+            foreach ($results as $get)
             {
-                $get[0];
+                return $get[0];
             }
-
-            return $get[0];
         }
 
         public static function getLoginData($username, $password)
@@ -91,11 +87,9 @@
                 $get[0];
             }
 
-            if($get[0])
+            if(!empty($get[0]))
             {
                 return 1;
-                unset($_POST);
-                $_POST = array();
             }
             else
             {
@@ -105,21 +99,21 @@
 
         public static function register()
         {
-            if(empty($username) || empty($password) || empty($repassword) || empty($email))
+            if(empty($_POST['username']) || empty($_POST['password']) || empty($_POST['repassword']) || empty($_POST['email']))
             {
                 error_msg("Username/Password/Repassword/Email Field is empty!");
             }
-            else if(strlen($password) <= 6)
+            else if(strlen($_POST['password']) <= 6)
             {
                 error_msg("Password must be longer than 6 Characters long!");
             }
-            else if($password != $repassword)
+            else if($_POST['password'] != $_POST['repassword'])
             {
                 error_msg("Password didn't Matched!");
             }
             else
             {
-                $checkExists = self::getRegistrationData();
+                $checkExists = self::getRegistrationData($_POST['username'], $_POST['email']);
 
                 if($checkExists == 1)
                 {
@@ -129,21 +123,23 @@
                 {
                     try
                     {
-                        $ip = get_intIp();
+                        $ipINT = self::get_intIp(get_ip());
+                        $BirthAuth = $_POST['Year']+$_POST['Month']+$_POST['Day'];
+
                         $request = database::$connection->prepare("
                         EXEC
                             DNMembership.dbo.__CreateAccount
-                            @AccountName :user,
-                            @Password :pass,
-                            @IPAddress :ip,
-                            @Email :mail,
-                            @Birth :birth
+                                :user,
+                                :pass,
+                                :ip,
+                                :mail,
+                                :birth
                         ");
                         $request->bindParam(':user', $_POST['username'], PDO::PARAM_STR);
                         $request->bindParam(':pass', $_POST['password'], PDO::PARAM_STR);
-                        $request->bindParam(':ip', $ip, PDO::PARAM_INT);
-                        $request->bindParam(':mail', $email, PDO::PARAM_STR);
-                        $request->bindParam(':birth', $_POST['Year'].$_POST['Month'].$_POST['Day'], PDO::PARAM_STR);
+                        $request->bindParam(':ip', $ipINT, PDO::PARAM_INT);
+                        $request->bindParam(':mail', $_POST['email'], PDO::PARAM_STR);
+                        $request->bindParam(':birth', $BirthAuth, PDO::PARAM_STR);
                         $request->execute();
 
                         success_msg("Successfully Registered! You can now Login and Play the Game.");
@@ -158,13 +154,13 @@
 
         public static function login()
         {
-            if(empty($_POST['username']) || empty($_POST['password']))
+            if(empty($_POST['lusername']) || empty($_POST['lpassword']))
             {
                 error_msg("Username/Password Field is empty!");
             }
             else
             {
-                $check = self::getLoginData($_POST['username'], $_POST['password']);
+                $check = self::getLoginData($_POST['lusername'], $_POST['lpassword']);
 
                 if($check == 0)
                 {
@@ -174,11 +170,12 @@
                 {
                     try
                     {
-                        $md5 = md5($_POST['password']);
+                        $md5Pass = md5($_POST['lpassword']);
                         $request = database::$connection->prepare("
                         SELECT
                             AccountID,
-                            AccountName
+                            AccountName,
+                            cash
                         FROM
                             DNMembership.dbo.Accounts
                         WHERE
@@ -186,9 +183,19 @@
                         AND
                             RLKTPassword = :pass");
 
-                        $request->bindParam(':user', $username, PDO::PARAM_STR);
-                        $request->bindParam(':pass', $md5, PDO::PARAM_STR);
+                        $request->bindParam(':user', $_POST['lusername'], PDO::PARAM_STR);
+                        $request->bindParam(':pass', $md5Pass, PDO::PARAM_STR);
                         $request->execute();
+
+                        $result = $request->fetchall();
+
+                        foreach($result as $get)
+                        {
+                            $_SESSION['AccountID'] = $get['AccountID'];
+                            $_SESSION['AccountName'] = $get['AccountName'];
+                            $_SESSION['cash'] = $get['cash'];
+                        }
+                        header('Location: /');
                     }
                     catch(Exception $e)
                     {
@@ -196,6 +203,14 @@
                     }
                 }
             }
+        }
+
+        public static function logout()
+        {
+            session_unset();
+            session_destroy();
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            exit();
         }
 
         public static function get_user_info()

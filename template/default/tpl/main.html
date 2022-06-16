@@ -20,13 +20,8 @@
 </header>
 <div class="container">
     <?php if(strpos($_SERVER['REQUEST_URI'], 'Register') !== false)
-    { ?>
-        <main class="content">
-            <div class="alert alert-info">
-                test
-            </div>
-        </main>
-    <?php
+    {
+        require_once base_path . 'template/' . get_config('template') . '/tpl/register.html';
     }
     else
     { ?>
@@ -38,14 +33,22 @@
         <div class="download-button flex-c-c">
             <a href="/Downloads"><span>Download</span> Download files to play a game</a>
         </div>
+        <?php
+            if(isset($_SESSION['AccountID']))
+            {
+                require_once base_path . 'template/' . get_config('template') . '/tpl/Ainfo.html';
+            }
+            else
+            {
+        ?>
         <div class="login-block" id="Login-form">
             <?php 
                 error_msg();
                 success_msg();
             ?>
             <form action="" method="POST">
-                <p><input type="text" name="username" placeholder="Username"></p>
-                <p><input type="password" name="password" placeholder="Password"></p>
+                <p><input type="text" name="lusername" placeholder="Username"></p>
+                <p><input type="password" name="lpassword" placeholder="Password"></p>
                 <div class="login flex-s">
                     <div class="l-login">
                         <p><a href="/Register" class="reg">NEW HERE?</a></p>
@@ -56,6 +59,9 @@
                 </div>
             </form>
         </div>
+        <?php
+            }
+        ?>
         <div class="widget">
             <span class="widget-title flex-c-c">Server Statistics</span>
             <ul>
